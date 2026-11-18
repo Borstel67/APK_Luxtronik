@@ -72,7 +72,7 @@ Voraussetzungen und Tests: siehe [Entwicklung](docs/ENTWICKLUNG.md).
 - **Signaturschlüssel** `keys/` – privat.
 - **`tools/wp.jar`** – das Original-Applet ist Eigentum des Herstellers und wird nicht weiterverteilt.
   Es wird nur zum Neuerzeugen von `web/lux_data.js` gebraucht und kann von der eigenen Steuerung geladen werden
-  ([Anleitung](docs/LUXTRONIK_EINRICHTUNG.md#4-wpjar-ins-projekt-einbinden-entwickler)).
+  ([Anleitung](docs/LUXTRONIK_EINRICHTUNG.md#5-wpjar-ins-projekt-einbinden-entwickler)).
 
 ## Hinweis
 

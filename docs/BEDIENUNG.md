@@ -18,7 +18,7 @@ Updates einfach über die alte Version installieren – die Einstellungen bleibe
 
 Tab **App** öffnen, IP-Adresse der Wärmepumpe, Passwort (Standard `999999`) und ggf. den
 Installateur-Code eintragen, dann **Speichern & verbinden**. Details siehe
-[Abschnitt 3 der Einrichtung](LUXTRONIK_EINRICHTUNG.md#3-java-schnittstelle-in-der-app-aktivieren).
+[Abschnitt 4 der Einrichtung](LUXTRONIK_EINRICHTUNG.md#4-java-schnittstelle-in-der-app-aktivieren).
 
 ## Aufbau
 

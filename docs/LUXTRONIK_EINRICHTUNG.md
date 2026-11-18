@@ -8,9 +8,10 @@ das die Steuerung über ihre eigene Webseite (`java.html`) ausliefert: per Binä
 Diese Anleitung beschreibt
 
 1. die Einstellungen am Bedienteil der Wärmepumpe,
-2. die Prüfung, ob die Java-Schnittstelle erreichbar ist,
-3. das Aktivieren der Java-Schnittstelle in der App,
-4. das Einbinden der `wp.jar` in dieses Projekt (nur für Entwickler, wenn `web/lux_data.js` neu erzeugt werden soll).
+2. die Besonderheiten je nach Firmware-Version,
+3. die Prüfung, ob die Java-Schnittstelle erreichbar ist,
+4. das Aktivieren der Java-Schnittstelle in der App,
+5. das Einbinden der `wp.jar` in dieses Projekt (nur für Entwickler, wenn `web/lux_data.js` neu erzeugt werden soll).
 
 > Getestete Anlage: Luxtronik 2, Typ LWC, Software **V1.86.0**, IP 192.168.178.120.
 
@@ -44,7 +45,19 @@ IP-Adresse – ändert sie sich, findet die App die Anlage nicht mehr.
 > Hinweis: Menünamen können je nach Hersteller (alpha innotec, Novelan, Siemens, Bosch …) und Softwarestand
 > leicht abweichen. Die Einstellungen liegen immer im Bereich **Service → Systemsteuerung**.
 
-## 2. Prüfen, ob die Schnittstelle erreichbar ist
+## 2. Besonderheiten je nach Firmware-Version
+
+Je nachdem, wie alt die Software auf deinem Regler ist, verhält sich der Zugriff auf `wp.jar` unterschiedlich:
+
+* **Ältere Firmware (bis Version 1.80).** Der Aufruf der IP-Adresse im Browser startet das Java-Applet `wp.jar` noch automatisch.
+* **Neuere Firmware (ab Version 1.81 / 2.x / 3.x).** Der Hersteller hat die Weboberfläche auf HTML5/WebSockets umgestellt.
+  Bei Versionen bis 1.88 lässt sich die alte Java-Oberfläche bei Bedarf über Telnet (Port 23) wieder aktivieren,
+  indem im Verzeichnis `/home` eine Datei namens `java.html` angelegt wird. Bei Firmware über 1.88 ist Telnet gesperrt.
+  [[1](https://wiki.fhem.de/wiki/Luxtronik_2.0), [2](https://forum.timberwolf.io/viewtopic.php?t=2337), [3](https://www.wirzfamily.ch/luxtronik-2-0-heatpump-java-and-html-access/)]
+
+---
+
+## 3. Prüfen, ob die Schnittstelle erreichbar ist
 
 | Prüfung | Erwartung |
 |---|---|
@@ -79,7 +92,7 @@ und schreibt das Ergebnis nach `tools/lux_check_result.txt` und `tools/lux_java.
 | Verbindung bricht nach einiger Zeit ab / Webserver hängt | Der Webserver der Luxtronik ist schwach: Abfrageintervall in der App nicht unter 10–15 s setzen, nicht parallel mehrere Programme (ioBroker, Home Assistant …) im Sekundentakt abfragen lassen. Notfalls Steuerung neu starten. |
 | Werte lesbar, Ändern geht nicht | Passwort falsch bzw. nicht 6-stellig, oder in der App „Werte ändern erlauben“ ausgeschaltet |
 
-## 3. Java-Schnittstelle in der App aktivieren
+## 4. Java-Schnittstelle in der App aktivieren
 
 In der App: Tab **App** (Einstellungen)
 
@@ -100,7 +113,7 @@ In der App: Tab **App** (Einstellungen)
 Der Installateur-Code wird – wie im Original-Applet – **nur in der App** geprüft; an die Steuerung wird
 dabei nichts gesendet. Er blendet lediglich zusätzliche Einstellungen ein.
 
-## 4. wp.jar ins Projekt einbinden (Entwickler)
+## 5. wp.jar ins Projekt einbinden (Entwickler)
 
 Die **App selbst braucht die `wp.jar` zur Laufzeit nicht** – alle benötigten Texte und Tabellen sind in
 `web/lux_data.js` enthalten. Die `wp.jar` wird nur gebraucht, um `web/lux_data.js` neu zu erzeugen
@@ -109,16 +122,16 @@ Die **App selbst braucht die `wp.jar` zur Laufzeit nicht** – alle benötigten 
 > Die `wp.jar` ist urheberrechtlich geschütztes Eigentum des Herstellers (AIT, signiert `META-INF/AIT_WEBS.*`)
 > und ist deshalb **nicht im Repository** enthalten (`.gitignore`). Jeder holt sie sich von der eigenen Steuerung.
 
-### 4.1 wp.jar von der eigenen Steuerung holen
+### 5.1 wp.jar von der eigenen Steuerung holen
 
-1. Im Browser `http://<IP-der-WP>/` öffnen. Bei Firmware mit Java-Oberfläche lädt die Startseite
+1. Im Browser `http://<IP-der-WP>/` öffnen. Bei Firmware mit Java-Oberfläche (siehe [Abschnitt 2](#2-besonderheiten-je-nach-firmware-version)) lädt die Startseite
    (`java.html`) das Applet `wp.jar` (im Seitenquelltext beim `<applet …>`-Tag als `archive` angegeben).
 2. Die Datei direkt laden, z. B. `http://192.168.178.120/wp.jar`, und als **`tools/wp.jar`** speichern.
 
 Moderne Browser führen Java-Applets nicht mehr aus. Wer das Original trotzdem starten möchte,
 kann den `appletviewer` aus einem **JDK 8** verwenden: `appletviewer http://192.168.178.120/java.html`.
 
-### 4.2 lux_data.js neu erzeugen
+### 5.2 lux_data.js neu erzeugen
 
 Benötigt: Java (JDK), Python 3, [CFR-Decompiler](https://www.benf.org/other/cfr/) (`cfr.jar`).
 
@@ -131,7 +144,7 @@ python3 tools/gen_luxdata.py src_wp jar_wp web/java_ui.js web/lux_data.js
 
 `src_wp/` und `jar_wp/` sind ebenfalls per `.gitignore` ausgeschlossen.
 
-### 4.3 Was aus der wp.jar übernommen wurde
+### 5.3 Was aus der wp.jar übernommen wurde
 
 Details zur Analyse (Protokoll, Parameter, Zugriffsstufen, Abgleich mit Live-Daten) stehen in
 [`ANALYSE_wp_jar.md`](../ANALYSE_wp_jar.md). Kurzfassung des Protokolls (Big-Endian int32 über TCP):
