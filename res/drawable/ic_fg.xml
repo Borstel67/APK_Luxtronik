@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 108dp adaptive foreground im AquaControl-Stil: Verlauf Blau->Cyan (Hintergrund), weißes Haus mit Wärmewellen -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#4CC9F0" android:fillAlpha="0.55"
+        android:pathData="M54,18 L90,18 L90,90 L18,90 Z" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="5" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M32,52 L54,34 L76,52" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="5" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M37,48 L37,76 L71,76 L71,48" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="4" android:strokeLineCap="round"
+        android:pathData="M48,71 C44,66 52,63 48,58 M60,71 C56,66 64,63 60,58" />
+</vector>

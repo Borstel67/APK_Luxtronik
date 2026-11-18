@@ -1,0 +1,8 @@
+build/
+keys/
+*.pem
+# Original-Applet von AIT – urheberrechtlich geschützt, nicht weiterverteilen
+tools/wp.jar
+src_wp/
+jar_wp/
+out/

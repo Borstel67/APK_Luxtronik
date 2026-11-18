@@ -1,0 +1,21 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage({ viewport: { width: 400, height: 860 } });
+  const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto('http://127.0.0.1:8099/index.html');
+  await p.evaluate(() => { localStorage.setItem('lux.host','127.0.0.1'); });
+  await p.reload(); await p.waitForTimeout(3000);
+  await p.screenshot({ path: '/root/wp/mock/r1.png', fullPage: true });
+  const tiles = await p.$$eval('.tile', a => a.map(x => x.innerText.replace(/\n/g,' ')));
+  const hero = await p.innerText('.hero');
+  await p.click('#tabs button[data-tab=menu]'); await p.waitForTimeout(300);
+  const pill = await p.textContent('.pill');
+  await p.click('.li.nav:has-text("Einstellungen")'); await p.click('.li.nav:has-text("Temperaturen")'); await p.waitForTimeout(800);
+  const editable = await p.$$eval('.li.edit .k', a => a.length); const total = await p.$$eval('.li .k', a => a.length);
+  await p.click('text=Hysterese HR'); await p.waitForTimeout(200);
+  const stepper = await p.textContent('#sv'); await p.click('#bc');
+  await p.screenshot({ path: '/root/wp/mock/r2.png', fullPage: true });
+  console.log(JSON.stringify({ hero, tiles, pill, editable, total, stepper, errs }, null, 1));
+  await b.close();
+})();

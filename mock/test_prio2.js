@@ -1,0 +1,12 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const out = { errs: [] };
+  const p = await b.newPage({ viewport: { width: 400, height: 1200 }, deviceScaleFactor: 2, colorScheme: 'dark' });
+  p.on('pageerror', e => out.errs.push(e.message));
+  await p.addInitScript(() => { window.__javaHttp = 'http://127.0.0.1:8098'; localStorage.setItem('lux.host','127.0.0.1'); });
+  await p.goto('http://127.0.0.1:8099/index.html'); await p.waitForTimeout(1500);
+  out.dash = await p.innerText('[data-jl="prio"]');
+  await p.screenshot({ path: '/root/wp/mock/prio_dash.png' });
+  await p.click('[data-jl="prio"]'); await p.waitForTimeout(300); out.page = await p.innerText('#title');
+  await p.click('[data-jback]'); await p.waitForTimeout(300); out.backTab = await p.evaluate(() => app.tab);
+  await p.click('#tabs button[data-tab=heiz]'); await p.waitForTimeout(300); out.heizHasPrio = !!(await p.$('[data-jl="prio"]'));
+  console.log(JSON.stringify(out)); await b.close(); })();
