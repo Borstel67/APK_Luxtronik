@@ -55,6 +55,56 @@ Je nachdem, wie alt die Software auf deinem Regler ist, verhält sich der Zugrif
   indem im Verzeichnis `/home` eine Datei namens `java.html` angelegt wird. Bei Firmware über 1.88 ist Telnet gesperrt.
   [[1](https://wiki.fhem.de/wiki/Luxtronik_2.0), [2](https://forum.timberwolf.io/viewtopic.php?t=2337), [3](https://www.wirzfamily.ch/luxtronik-2-0-heatpump-java-and-html-access/)]
 
+### 2.1 Java-Oberfläche per `java.html` wieder einschalten (Firmware 1.81 … 1.88)
+
+Vorgehen nach der Anleitung auf wirzfamily.ch:
+**[Luxtronik 2.0 Heatpump – Java and HTML access (wirzfamily.ch)](https://www.wirzfamily.ch/luxtronik-2-0-heatpump-java-and-html-access/)**.
+Die `wp.jar` selbst liegt bereits im Web-Verzeichnis der Steuerung – es fehlt nur die Startseite `java.html`, die das Applet lädt.
+
+1. **Telnet-Verbindung** zur Steuerung öffnen (Port 23), Anmeldung als Benutzer `root` **ohne Passwort**:
+   ```
+   telnet 192.168.178.120
+   ```
+   (Unter Windows ggf. vorher „Telnet-Client“ in *Windows-Features* aktivieren oder PuTTY verwenden.)
+2. Ins Verzeichnis `/home` wechseln und die Datei anlegen:
+   ```
+   cd /home
+   vi java.html
+   ```
+   Im `vi` mit `i` in den Einfügemodus wechseln und folgenden Inhalt einfügen:
+   ```html
+   <!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+   <html>
+   <head>
+   <title>WEBSERVER - Wärmepumpe - Heatpump</title>
+   </head>
+   <body>
+   <table align="center" valign="center" width="100%" height="1000px">
+   <tr><td>
+   <applet code="communication.WpApplet" archive="wp.jar" width="100%" height="100%">
+   </applet>
+   </td></tr>
+   </table>
+   </body>
+   </html>
+   ```
+   Mit `Esc`, dann `:wq` und Enter speichern und `vi` verlassen.
+3. Aufruf danach:
+   - alte Java-Oberfläche: `http://192.168.178.120/java.html`
+   - neue HTML-Oberfläche (unverändert): `http://192.168.178.120/`
+4. Damit das Applet am PC startet:
+   - **32-Bit-Java** verwenden (mit 64-Bit-Java bleibt die Seite laut Kommentaren auf der Seite leer),
+   - die Adresse der Wärmepumpe in der *Java-Systemsteuerung → Sicherheit* zur **Ausnahmeliste** hinzufügen,
+   - unter Windows 11 Edge im **Internet-Explorer-Modus** oder mit dem Add-on „IE Tab“ nutzen.
+   Alternativ `appletviewer` aus einem JDK 8 (siehe Abschnitt 5.1).
+
+**Hinweise**
+
+- Laut der Seite funktioniert Telnet bis **V1.88.0**; ab **V1.89.0** ist es gesperrt. Ein Firmware-Update kann den Zugang also dauerhaft schließen.
+- Für die **App ist dieser Schritt nicht nötig**: Die Java-Schnittstelle auf Port 8888 läuft unabhängig von der `java.html`. Die Datei braucht man nur, um das Original-Applet im Browser zu nutzen.
+- Rückgängig machen (nicht auf der Seite beschrieben, naheliegend): per Telnet `rm /home/java.html`.
+- Telnet ist unverschlüsselt und der `root`-Zugang hat kein Passwort – Port 23 der Wärmepumpe **niemals ins Internet freigeben** (keine Portweiterleitung im Router). Eingriffe in das System der Steuerung erfolgen auf eigene Verantwortung.
+
 ---
 
 ## 3. Prüfen, ob die Schnittstelle erreichbar ist
@@ -126,7 +176,8 @@ Die **App selbst braucht die `wp.jar` zur Laufzeit nicht** – alle benötigten 
 
 1. Im Browser `http://<IP-der-WP>/` öffnen. Bei Firmware mit Java-Oberfläche (siehe [Abschnitt 2](#2-besonderheiten-je-nach-firmware-version)) lädt die Startseite
    (`java.html`) das Applet `wp.jar` (im Seitenquelltext beim `<applet …>`-Tag als `archive` angegeben).
-2. Die Datei direkt laden, z. B. `http://192.168.178.120/wp.jar`, und als **`tools/wp.jar`** speichern.
+2. Die Datei direkt laden, z. B. `http://192.168.178.120/wp.jar` (sie liegt im Web-Verzeichnis der Steuerung, siehe
+   [wirzfamily.ch](https://www.wirzfamily.ch/luxtronik-2-0-heatpump-java-and-html-access/)), und als **`tools/wp.jar`** speichern.
 
 Moderne Browser führen Java-Applets nicht mehr aus. Wer das Original trotzdem starten möchte,
 kann den `appletviewer` aus einem **JDK 8** verwenden: `appletviewer http://192.168.178.120/java.html`.
